@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <color name="pin_border_stroke">#000000</color>
+  <color name="pin_indicator_enabled">#000000</color>
+  <color name="pin_indicator_success">#68CE00</color>
+  <color name="pin_indicator_failed">#D32F2F</color>
+  <color name="pin_entry_text">#000000</color>
+  <color name="keyboard_button">#000000</color>
+</resources>
