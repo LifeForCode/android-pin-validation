@@ -6,13 +6,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.github.lifeforcode.pinvalidation.domain.event.IKeyboardEvent
@@ -32,17 +33,18 @@ fun PinValidation(
   resultHandler: IPinValidationResultHandler,
 ) {
   val viewModel = viewModel(pinCodeProvider, resultHandler)
-  val state by viewModel.uiState.collectAsState()
+  val state by viewModel.uiState.collectAsStateWithLifecycle()
   Column(
     modifier = Modifier
-      .background(color = White)
+      .background(color = Color.White)
+      .padding(bottom = 30.dp)
       .fillMaxSize(),
-    verticalArrangement = Arrangement.Center,
+    verticalArrangement = Arrangement.Bottom,
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
     PinValidationHeader(state)
     Spacer(modifier = Modifier.height(50.dp))
-    Keyboard {
+    Keyboard(state) {
       if (shouldHandleKeyboardEvent(it, state))
         handleKeyBoardEvent(it, viewModel::onEvent)
     }
@@ -65,6 +67,6 @@ private fun shouldHandleKeyboardEvent(event: IKeyboardEvent, state: PinValidatio
 private fun handleKeyBoardEvent(event: IKeyboardEvent, pinValidationEventHandler: IPinValidationEventHandler) {
   when (event) {
     is IKeyboardEvent.DigitInput -> pinValidationEventHandler(IPinValidationEvent.AddDigit(event.digit))
-    IKeyboardEvent.DeleteLastDigit -> pinValidationEventHandler(IPinValidationEvent.RemoveLastDigit)
+    is IKeyboardEvent.DeleteLastDigit -> pinValidationEventHandler(IPinValidationEvent.RemoveLastDigit)
   }
 }

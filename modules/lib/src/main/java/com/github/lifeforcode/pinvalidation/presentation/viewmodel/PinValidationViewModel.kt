@@ -11,12 +11,13 @@ import com.github.lifeforcode.pinvalidation.domain.model.pinvalidation.result.Pi
 import com.github.lifeforcode.pinvalidation.domain.model.pinvalidation.state.PinInput
 import com.github.lifeforcode.pinvalidation.domain.model.pinvalidation.state.PinValidationState
 import com.github.lifeforcode.pinvalidation.domain.model.pinvalidation.state.PinValidationUiState
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 internal class PinValidationViewModel(
   pinCodeProvider: IPinCodeProvider,
@@ -24,15 +25,17 @@ internal class PinValidationViewModel(
 ) : ViewModel() {
 
   private val mPinCode = pinCodeProvider.pinCode
+  private val mPinCodeValidator = PinCodeValidator()
 
-  private val mUiState = MutableStateFlow(PinValidationUiState(mPinCode.size))
+  private val mInitialUiState get() = PinValidationUiState(mPinCode.size)
+  private val mUiState = MutableStateFlow(mInitialUiState)
   internal val uiState: StateFlow<PinValidationUiState> = mUiState.asStateFlow()
 
   internal fun onEvent(event: IPinValidationEvent) {
-    viewModelScope.launch(Dispatchers.Default) {
+    viewModelScope.launch {
       when (event) {
         is AddDigit -> handleAddDigitEvent(event)
-        RemoveLastDigit -> handleRemoveDigitEvent()
+        is RemoveLastDigit -> handleRemoveDigitEvent()
       }
     }
   }
@@ -46,7 +49,7 @@ internal class PinValidationViewModel(
       it.copyOnInput(newPinInput)
     }
     if (mUiState.value.isReadyToValidate)
-      validatePinCode()
+      mPinCodeValidator.invoke()
   }
 
   private fun handleRemoveDigitEvent() {
@@ -65,20 +68,32 @@ internal class PinValidationViewModel(
 
   private val PinInput.isFull get() = this.size == mPinCode.size
 
-  private fun validatePinCode() {
-    val pinCode = mUiState.value.pinInput.asPinCode
-    val validationState = if (pinCode == mPinCode) PinValidationState.Success else PinValidationState.Failed
-    mUiState.update {
-      it.copy(validationState = validationState)
-    }
-    val validationResult = validationState.toValidationResult()
-    mResultHandler(validationResult)
-  }
+  private inner class PinCodeValidator {
 
-  private fun PinValidationState.toValidationResult(): PinValidationResult =
-    when (this) {
-      PinValidationState.Success -> PinValidationResult.Success
-      PinValidationState.Failed -> PinValidationResult.Failed
-      else -> PinValidationResult.NotPresent
+    fun invoke() {
+      val pinCode = mUiState.value.pinInput.asPinCode
+      val validationState = if (pinCode == mPinCode) PinValidationState.Success else PinValidationState.Failed
+      mUiState.update {
+        it.copy(validationState = validationState)
+      }
+      val validationResult = validationState.toValidationResult()
+      mResultHandler(validationResult)
+      if (validationState.isFailed)
+        setInitialUiState()
     }
+
+    private fun PinValidationState.toValidationResult(): PinValidationResult =
+      when (this) {
+        PinValidationState.Success -> PinValidationResult.Success
+        PinValidationState.Failed -> PinValidationResult.Failed
+        else -> PinValidationResult.NotPresent
+      }
+
+    private fun setInitialUiState() {
+      viewModelScope.launch {
+        delay(500.milliseconds)
+        mUiState.value = mInitialUiState
+      }
+    }
+  }
 }

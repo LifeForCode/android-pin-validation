@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.github.lifeforcode.pinvalidation.domain.event.IKeyboardEvent
 import com.github.lifeforcode.pinvalidation.domain.event.IKeyboardEvent.DeleteLastDigit
 import com.github.lifeforcode.pinvalidation.domain.event.IKeyboardEvent.DigitInput
+import com.github.lifeforcode.pinvalidation.domain.model.pinvalidation.state.PinValidationUiState
 import com.github.lifeforcode.pinvalidation.presentation.view.components.pinkeyboard.DigitButton.Digit0Button
 import com.github.lifeforcode.pinvalidation.presentation.view.components.pinkeyboard.DigitButton.Digit1Button
 import com.github.lifeforcode.pinvalidation.presentation.view.components.pinkeyboard.DigitButton.Digit2Button
@@ -24,24 +26,29 @@ import com.github.lifeforcode.pinvalidation.presentation.view.components.pinkeyb
 
 @Composable
 internal fun Keyboard(
+  state: PinValidationUiState,
   onEvent: (IKeyboardEvent) -> Unit,
 ) {
   val rowModifier = Modifier.wrapContentSize()
+  val rowArrangement = Arrangement.spacedBy(20.dp)
   Column(
     modifier = Modifier.wrapContentSize(),
-    verticalArrangement = Arrangement.Bottom,
+    verticalArrangement = Arrangement.spacedBy(5.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
-    FirstRow(modifier = rowModifier, onEvent = onEvent)
-    SecondRow(modifier = rowModifier, onEvent = onEvent)
-    ThirdRow(modifier = rowModifier, onEvent = onEvent)
-    FourthRow(modifier = rowModifier, onEvent = onEvent)
+    FirstRow(rowModifier, rowArrangement, onEvent)
+    SecondRow(rowModifier, rowArrangement, onEvent)
+    ThirdRow(rowModifier, rowArrangement, onEvent)
+    FourthRow(rowModifier, rowArrangement, shouldShowDeleteButton = state.pinCodeInputSize > 0, onEvent)
   }
 }
 
 @Composable
-private fun FirstRow(modifier: Modifier, onEvent: (IKeyboardEvent) -> Unit) {
-  Row(modifier = modifier) {
+private fun FirstRow(modifier: Modifier, arrangement: Arrangement.Horizontal, onEvent: (IKeyboardEvent) -> Unit) {
+  Row(
+    modifier = modifier,
+    horizontalArrangement = arrangement,
+  ) {
     KeyboardButton(Digit1Button) { onEvent(DigitInput(Digit1Button.digit)) }
     KeyboardButton(Digit2Button) { onEvent(DigitInput(Digit2Button.digit)) }
     KeyboardButton(Digit3Button) { onEvent(DigitInput(Digit3Button.digit)) }
@@ -49,8 +56,11 @@ private fun FirstRow(modifier: Modifier, onEvent: (IKeyboardEvent) -> Unit) {
 }
 
 @Composable
-private fun SecondRow(modifier: Modifier, onEvent: (IKeyboardEvent) -> Unit) {
-  Row(modifier = modifier) {
+private fun SecondRow(modifier: Modifier, arrangement: Arrangement.Horizontal, onEvent: (IKeyboardEvent) -> Unit) {
+  Row(
+    modifier = modifier,
+    horizontalArrangement = arrangement,
+  ) {
     KeyboardButton(Digit4Button) { onEvent(DigitInput(Digit4Button.digit)) }
     KeyboardButton(Digit5Button) { onEvent(DigitInput(Digit5Button.digit)) }
     KeyboardButton(Digit6Button) { onEvent(DigitInput(Digit6Button.digit)) }
@@ -58,8 +68,11 @@ private fun SecondRow(modifier: Modifier, onEvent: (IKeyboardEvent) -> Unit) {
 }
 
 @Composable
-private fun ThirdRow(modifier: Modifier, onEvent: (IKeyboardEvent) -> Unit) {
-  Row(modifier = modifier) {
+private fun ThirdRow(modifier: Modifier, arrangement: Arrangement.Horizontal, onEvent: (IKeyboardEvent) -> Unit) {
+  Row(
+    modifier = modifier,
+    horizontalArrangement = arrangement,
+  ) {
     KeyboardButton(Digit7Button) { onEvent(DigitInput(Digit7Button.digit)) }
     KeyboardButton(Digit8Button) { onEvent(DigitInput(Digit8Button.digit)) }
     KeyboardButton(Digit9Button) { onEvent(DigitInput(Digit9Button.digit)) }
@@ -67,10 +80,17 @@ private fun ThirdRow(modifier: Modifier, onEvent: (IKeyboardEvent) -> Unit) {
 }
 
 @Composable
-private fun FourthRow(modifier: Modifier, onEvent: (IKeyboardEvent) -> Unit) {
-  Row(modifier = modifier) {
+private fun FourthRow(modifier: Modifier, arrangement: Arrangement.Horizontal, shouldShowDeleteButton: Boolean = true, onEvent: (IKeyboardEvent) -> Unit) {
+  Row(
+    modifier = modifier,
+    horizontalArrangement = arrangement,
+  ) {
     KeyboardButton(ButtonStub)
     KeyboardButton(Digit0Button) { onEvent(DigitInput(Digit0Button.digit)) }
-    KeyboardButton(DeleteButton) { onEvent(DeleteLastDigit) }
+    if (shouldShowDeleteButton) {
+      KeyboardButton(DeleteButton) { onEvent(DeleteLastDigit) }
+    } else {
+      KeyboardButton(ButtonStub)
+    }
   }
 }

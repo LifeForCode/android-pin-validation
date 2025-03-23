@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
@@ -29,10 +28,9 @@ internal fun KeyboardButton(
   onClick: (() -> Unit)? = null,
 ) {
   val modifier = Modifier
-    .padding(8.dp)
     .clip(CircleShape)
     .background(Transparent, CircleShape)
-    .defaultMinSize(minWidth = 80.dp, minHeight = 80.dp)
+    .defaultMinSize(minWidth = 70.dp, minHeight = 70.dp)
     .maybeClickable(onClick)
   Box(
     modifier = modifier,
@@ -55,7 +53,7 @@ private fun ButtonContent(button: IKeyboardButton) {
 private fun DigitButtonContent(digit: Digit) {
   Text(
     text = digit.toString(),
-    fontSize = 30.sp,
+    fontSize = 26.sp,
     fontWeight = FontWeight.Normal,
     color = colorResource(R.color.keyboard_button),
   )
@@ -66,7 +64,7 @@ private fun IconButtonContent(@DrawableRes drawableResId: Int) {
   Icon(
     painter = painterResource(id = drawableResId),
     contentDescription = "Clear",
-    modifier = Modifier.size(30.dp),
+    modifier = Modifier.size(26.dp),
     tint = colorResource(R.color.keyboard_button),
   )
 }
