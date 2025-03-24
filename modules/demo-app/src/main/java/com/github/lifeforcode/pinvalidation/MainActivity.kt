@@ -11,22 +11,17 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.github.lifeforcode.pinvalidation.domain.model.pincode.PinCode
-import com.github.lifeforcode.pinvalidation.domain.model.pincode.provider.PinCodeHolder
 import com.github.lifeforcode.pinvalidation.domain.model.pinvalidation.result.PinValidationResult
 import com.github.lifeforcode.pinvalidation.presentation.view.components.PinValidation
 import com.github.lifeforcode.pinvalidation.ui.theme.PinValidationViewTheme
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-  @Inject lateinit var mPinCodeHolder: PinCodeHolder
-
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
-    mPinCodeHolder.setPinCode(PinCode.fromString("1234"))
     setContent {
       Content()
     }
@@ -39,7 +34,7 @@ class MainActivity : ComponentActivity() {
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background,
       ) {
-        PinValidation(mPinCodeHolder, ::onPinValidationResult)
+        PinValidation(PinCode.fromString("1234"), ::onPinValidationResult)
       }
     }
   }

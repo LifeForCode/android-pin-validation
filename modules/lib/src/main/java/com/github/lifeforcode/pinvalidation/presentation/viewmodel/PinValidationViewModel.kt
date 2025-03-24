@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.lifeforcode.pinvalidation.domain.event.IPinValidationEvent
 import com.github.lifeforcode.pinvalidation.domain.event.IPinValidationEvent.AddDigit
 import com.github.lifeforcode.pinvalidation.domain.event.IPinValidationEvent.RemoveLastDigit
-import com.github.lifeforcode.pinvalidation.domain.model.pincode.provider.IPinCodeProvider
+import com.github.lifeforcode.pinvalidation.domain.model.pincode.PinCode
 import com.github.lifeforcode.pinvalidation.domain.model.pinvalidation.result.IPinValidationResultHandler
 import com.github.lifeforcode.pinvalidation.domain.model.pinvalidation.result.PinValidationResult
 import com.github.lifeforcode.pinvalidation.domain.model.pinvalidation.state.PinInput
@@ -20,11 +20,10 @@ import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
 internal class PinValidationViewModel(
-  pinCodeProvider: IPinCodeProvider,
+  private val mPinCode: PinCode,
   private val mResultHandler: IPinValidationResultHandler,
 ) : ViewModel() {
 
-  private val mPinCode = pinCodeProvider.pinCode
   private val mPinCodeValidator = PinCodeValidator()
 
   private val mInitialUiState get() = PinValidationUiState(mPinCode.size)
@@ -91,7 +90,7 @@ internal class PinValidationViewModel(
 
     private fun setInitialUiState() {
       viewModelScope.launch {
-        delay(500.milliseconds)
+        delay(700.milliseconds)
         mUiState.value = mInitialUiState
       }
     }

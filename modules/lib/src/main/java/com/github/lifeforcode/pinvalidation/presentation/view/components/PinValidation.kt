@@ -20,7 +20,7 @@ import com.github.lifeforcode.pinvalidation.domain.event.IKeyboardEvent
 import com.github.lifeforcode.pinvalidation.domain.event.IPinValidationEvent
 import com.github.lifeforcode.pinvalidation.domain.event.IPinValidationEventHandler
 import com.github.lifeforcode.pinvalidation.domain.event.isDeleteLastDigit
-import com.github.lifeforcode.pinvalidation.domain.model.pincode.provider.IPinCodeProvider
+import com.github.lifeforcode.pinvalidation.domain.model.pincode.PinCode
 import com.github.lifeforcode.pinvalidation.domain.model.pinvalidation.result.IPinValidationResultHandler
 import com.github.lifeforcode.pinvalidation.domain.model.pinvalidation.state.PinValidationUiState
 import com.github.lifeforcode.pinvalidation.presentation.view.components.pinheader.PinValidationHeader
@@ -29,10 +29,10 @@ import com.github.lifeforcode.pinvalidation.presentation.viewmodel.PinValidation
 
 @Composable
 fun PinValidation(
-  pinCodeProvider: IPinCodeProvider,
+  pinCode: PinCode,
   resultHandler: IPinValidationResultHandler,
 ) {
-  val viewModel = viewModel(pinCodeProvider, resultHandler)
+  val viewModel = viewModel(pinCode, resultHandler)
   val state by viewModel.uiState.collectAsStateWithLifecycle()
   Column(
     modifier = Modifier
@@ -52,11 +52,11 @@ fun PinValidation(
 }
 
 @Composable
-private fun viewModel(pinCodeProvider: IPinCodeProvider, resultHandler: IPinValidationResultHandler) =
+private fun viewModel(pinCode: PinCode, resultHandler: IPinValidationResultHandler) =
   viewModel<PinValidationViewModel>(
     factory = viewModelFactory {
       addInitializer(PinValidationViewModel::class) {
-        PinValidationViewModel(pinCodeProvider, resultHandler)
+        PinValidationViewModel(pinCode, resultHandler)
       }
     }
   )
